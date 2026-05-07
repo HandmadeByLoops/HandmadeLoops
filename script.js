@@ -581,3 +581,37 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+async function sendChatMessage(message) {
+  try {
+    const res = await fetch("https://handmadebyloops.app.n8n.cloud/webhook/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: message
+      })
+    });
+
+    const data = await res.json();
+    return data.reply;
+  } catch (err) {
+    console.log("Chat error:", err);
+    return "Sorry, something went wrong.";
+  }
+}
+async function handleChat() {
+  const input = document.getElementById("chatInput");
+  const messages = document.getElementById("messages");
+
+  const text = input.value;
+  if (!text) return;
+
+  messages.innerHTML += `<div><b>You:</b> ${text}</div>`;
+  input.value = "";
+
+  const reply = await sendChatMessage(text);
+
+  messages.innerHTML += `<div><b>AI:</b> ${reply}</div>`;
+  messages.scrollTop = messages.scrollHeight;
+}
